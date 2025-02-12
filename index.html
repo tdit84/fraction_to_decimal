@@ -78,17 +78,25 @@
       margin-top: 10px;
       color: #555;
     }
-    /* Styling for a simple long division display */
+    /* Long division hint styling */
     .long-division {
-      display: inline-block;
-      text-align: left;
-      font-family: monospace;
       margin-top: 10px;
     }
-    .long-division .top-line {
-      border-bottom: 2px solid #000;
-      padding-right: 20px;
-      min-width: 50px;
+    .long-division-container {
+      display: inline-flex;
+      align-items: flex-end;
+    }
+    .divisor {
+      margin-right: 5px;
+      font-weight: bold;
+    }
+    .quotient {
+      min-width: 60px;
+      text-align: right;
+    }
+    .dividend {
+      border-top: 2px solid #000;
+      padding-left: 5px;
     }
     .flip-animation {
       display: inline-block;
@@ -122,11 +130,16 @@
       return '<span class="fraction"><span class="top">' + numerator + '</span><span class="bottom">' + denominator + '</span></span>';
     }
     
-    // Render a long division setup for numerator ÷ denominator without displaying the answer
+    // Render a long division hint with the divisor on the left and a vinculum line over the dividend only
     function renderLongDivisionHint(numerator, denominator) {
       return '<div class="long-division">' +
-             '<div class="top-line">&nbsp;</div>' +
-             '<div><span style="border-right:2px solid #000; padding-right:5px;">' + denominator + '</span> ' + numerator + '.000</div>' +
+             '<div class="long-division-container">' +
+             '<div class="divisor">' + denominator + '</div>' +
+             '<div>' +
+             '<div class="quotient">&nbsp;</div>' +
+             '<div class="dividend">' + numerator + '.000</div>' +
+             '</div>' +
+             '</div>' +
              '</div>';
     }
     
@@ -145,24 +158,30 @@
       document.getElementById("message").innerHTML = "";
       document.getElementById("hintText").style.display = "none";
       
-      // Extended list of base denominators yielding terminating decimals
-      var denominators = [2, 4, 5, 8, 10, 20, 25, 40, 50, 100, 125, 200, 250, 500, 1000];
+      // Use a simpler set of denominators until 3 stars, then switch to the extended list
+      var denominators;
+      if (starCount < 3) {
+        denominators = [2, 3, 4, 5, 6, 8, 10];
+      } else {
+        denominators = [2, 4, 5, 8, 10, 20, 25, 40, 50, 100, 125, 200, 250, 500, 1000];
+      }
+      
       var denominator = denominators[Math.floor(Math.random() * denominators.length)];
-      // Numerator chosen to provide a variety of fractions
+      // Choose a numerator that gives a variety of fractions
       var numerator = Math.floor(Math.random() * (denominator * 2 - 1)) + 1;
       
       var fractionDisplay = renderFraction(numerator, denominator);
       var questionText = "Convert " + fractionDisplay + " to a decimal:";
       
-      // Compute the correct decimal answer (always with three decimals)
+      // Calculate the correct decimal answer (always shown with three decimals)
       var correctDecimal = (numerator / denominator).toFixed(3);
       
-      // Prepare the long division hint without showing the answer
+      // Prepare the long division hint without revealing the answer
       var longDivisionDisplay = renderLongDivisionHint(numerator, denominator);
       var hintMsg = "Hint: Set up the long division below and divide the numerator by the denominator.<br><br>" + longDivisionDisplay;
       document.getElementById("hintText").innerHTML = hintMsg;
       
-      // Generate answer choices (one correct and three distractors)
+      // Generate answer choices (one correct answer and three distractors)
       var choices = [];
       choices.push(correctDecimal);
       while (choices.length < 4) {

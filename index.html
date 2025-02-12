@@ -78,41 +78,28 @@
       margin-top: 10px;
       color: #555;
     }
-    /* Long division hint styling */
-    .long-division {
-      margin-top: 10px;
+    /* Long division table styling */
+    .long-division-table {
+      border-collapse: collapse;
+      display: inline-table;
     }
-    .long-division-container {
-      display: inline-flex;
-      align-items: stretch;
+    .long-division-table td {
+      padding: 0;
+      font-family: monospace;
+      font-size: 20px;
     }
-    .divisor {
+    .divisor-cell {
+      vertical-align: bottom;
+      border-right: 2px solid #000;
       font-weight: bold;
     }
-    .vertical-divider {
-      border-left: 2px solid #000;
-      margin: 0 5px;
-    }
-    .division-part {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-    }
-    .quotient {
-      min-width: 60px;
+    .quotient-cell {
       text-align: right;
+      min-width: 60px;
     }
-    .dividend {
+    .dividend-cell {
+      text-align: right;
       border-top: 2px solid #000;
-      padding-left: 5px;
-    }
-    .flip-animation {
-      display: inline-block;
-      animation: flip 1s ease;
-    }
-    @keyframes flip {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(180deg); }
     }
   </style>
 </head>
@@ -133,24 +120,25 @@
       document.getElementById("starCounter").innerHTML = "⭐ " + starCount;
     }
     
-    // Render a fraction with a numerator over a denominator (vinculum line)
+    // Render a fraction with a numerator over a denominator (using a vinculum)
     function renderFraction(numerator, denominator) {
       return '<span class="fraction"><span class="top">' + numerator + '</span><span class="bottom">' + denominator + '</span></span>';
     }
     
-    // Render a long division hint with the divisor on the left, a vertical divider,
-    // and the division-part containing an empty quotient and the dividend with the vinculum.
+    // Render a long division hint using an HTML table.
+    // The left cell shows the divisor with a right border (vertical line),
+    // the top right cell is the quotient area (left blank), and the bottom right cell shows the dividend with a top border (vinculum).
     function renderLongDivisionHint(numerator, denominator) {
-      return '<div class="long-division">' +
-             '<div class="long-division-container">' +
-             '<div class="divisor">' + denominator + '</div>' +
-             '<div class="vertical-divider"></div>' +
-             '<div class="division-part">' +
-             '<div class="quotient">&nbsp;</div>' +
-             '<div class="dividend">' + numerator + '.000</div>' +
-             '</div>' +
-             '</div>' +
-             '</div>';
+      return '<table class="long-division-table">' +
+             '<tr>' +
+               '<td class="divisor-cell">' + denominator + '</td>' +
+               '<td class="quotient-cell">&nbsp;</td>' +
+             '</tr>' +
+             '<tr>' +
+               '<td></td>' +
+               '<td class="dividend-cell">' + numerator + '.000</td>' +
+             '</tr>' +
+             '</table>';
     }
     
     // Fisher-Yates shuffle to randomize answer choices

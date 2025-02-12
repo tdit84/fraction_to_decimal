@@ -84,11 +84,19 @@
     }
     .long-division-container {
       display: inline-flex;
-      align-items: flex-end;
+      align-items: stretch;
     }
     .divisor {
-      margin-right: 5px;
       font-weight: bold;
+    }
+    .vertical-divider {
+      border-left: 2px solid #000;
+      margin: 0 5px;
+    }
+    .division-part {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
     }
     .quotient {
       min-width: 60px;
@@ -130,12 +138,14 @@
       return '<span class="fraction"><span class="top">' + numerator + '</span><span class="bottom">' + denominator + '</span></span>';
     }
     
-    // Render a long division hint with the divisor on the left and a vinculum line over the dividend only
+    // Render a long division hint with the divisor on the left, a vertical divider,
+    // and the division-part containing an empty quotient and the dividend with the vinculum.
     function renderLongDivisionHint(numerator, denominator) {
       return '<div class="long-division">' +
              '<div class="long-division-container">' +
              '<div class="divisor">' + denominator + '</div>' +
-             '<div>' +
+             '<div class="vertical-divider"></div>' +
+             '<div class="division-part">' +
              '<div class="quotient">&nbsp;</div>' +
              '<div class="dividend">' + numerator + '.000</div>' +
              '</div>' +

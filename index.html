@@ -88,6 +88,7 @@
     .long-division .top-line {
       border-bottom: 2px solid #000;
       padding-right: 20px;
+      min-width: 50px;
     }
     .flip-animation {
       display: inline-block;
@@ -121,10 +122,10 @@
       return '<span class="fraction"><span class="top">' + numerator + '</span><span class="bottom">' + denominator + '</span></span>';
     }
     
-    // Render a long division layout for numerator ÷ denominator with the decimal result above the vinculum line.
-    function renderLongDivision(numerator, denominator, decimalResult) {
+    // Render a long division setup for numerator ÷ denominator without displaying the answer
+    function renderLongDivisionHint(numerator, denominator) {
       return '<div class="long-division">' +
-             '<div class="top-line">' + decimalResult + '</div>' +
+             '<div class="top-line">&nbsp;</div>' +
              '<div><span style="border-right:2px solid #000; padding-right:5px;">' + denominator + '</span> ' + numerator + '.000</div>' +
              '</div>';
     }
@@ -139,27 +140,26 @@
       }
     }
     
-    // Generate a new fraction to decimal question
+    // Generate a new fraction-to-decimal question
     function generateQuestion() {
       document.getElementById("message").innerHTML = "";
       document.getElementById("hintText").style.display = "none";
       
-      // Use denominators that yield terminating decimals
-      var denominators = [2, 4, 5, 8, 10];
+      // Extended list of base denominators yielding terminating decimals
+      var denominators = [2, 4, 5, 8, 10, 20, 25, 40, 50, 100, 125, 200, 250, 500, 1000];
       var denominator = denominators[Math.floor(Math.random() * denominators.length)];
-      // Allow numerator between 1 and (denominator*2) for variety
+      // Numerator chosen to provide a variety of fractions
       var numerator = Math.floor(Math.random() * (denominator * 2 - 1)) + 1;
       
       var fractionDisplay = renderFraction(numerator, denominator);
       var questionText = "Convert " + fractionDisplay + " to a decimal:";
       
-      // Calculate correct decimal and remove trailing zeros if necessary
-      var correctDecimal = (numerator / denominator);
-      correctDecimal = parseFloat(correctDecimal.toFixed(3)).toString();
+      // Compute the correct decimal answer (always with three decimals)
+      var correctDecimal = (numerator / denominator).toFixed(3);
       
-      // Prepare the long division hint display
-      var longDivisionDisplay = renderLongDivision(numerator, denominator, correctDecimal);
-      var hintMsg = "Hint: Divide the numerator by the denominator using long division.<br><br>" + longDivisionDisplay;
+      // Prepare the long division hint without showing the answer
+      var longDivisionDisplay = renderLongDivisionHint(numerator, denominator);
+      var hintMsg = "Hint: Set up the long division below and divide the numerator by the denominator.<br><br>" + longDivisionDisplay;
       document.getElementById("hintText").innerHTML = hintMsg;
       
       // Generate answer choices (one correct and three distractors)
@@ -167,7 +167,7 @@
       choices.push(correctDecimal);
       while (choices.length < 4) {
         var offset = (Math.random() < 0.5 ? 0.1 : -0.1) * (Math.floor(Math.random() * 3) + 1);
-        var candidate = parseFloat((parseFloat(correctDecimal) + offset).toFixed(3)).toString();
+        var candidate = (parseFloat(correctDecimal) + offset).toFixed(3);
         if (choices.indexOf(candidate) === -1 && candidate !== correctDecimal) {
           choices.push(candidate);
         }

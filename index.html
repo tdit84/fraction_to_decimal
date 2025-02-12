@@ -87,19 +87,18 @@
       padding: 0;
       font-family: monospace;
       font-size: 20px;
+      vertical-align: middle;
     }
     .divisor-cell {
-      vertical-align: bottom;
       border-right: 2px solid #000;
+      padding-right: 5px;
       font-weight: bold;
     }
-    .quotient-cell {
+    .dividend-cell {
+      border-top: 2px solid #000;
+      padding-left: 5px;
       text-align: right;
       min-width: 60px;
-    }
-    .dividend-cell {
-      text-align: right;
-      border-top: 2px solid #000;
     }
   </style>
 </head>
@@ -120,23 +119,19 @@
       document.getElementById("starCounter").innerHTML = "⭐ " + starCount;
     }
     
-    // Render a fraction with a numerator over a denominator (using a vinculum)
+    // Render a fraction with a numerator over a denominator (vinculum representation)
     function renderFraction(numerator, denominator) {
       return '<span class="fraction"><span class="top">' + numerator + '</span><span class="bottom">' + denominator + '</span></span>';
     }
     
-    // Render a long division hint using an HTML table.
-    // The left cell shows the divisor with a right border (vertical line),
-    // the top right cell is the quotient area (left blank), and the bottom right cell shows the dividend with a top border (vinculum).
+    // Render a long division hint using a single-row HTML table.
+    // The left cell shows the divisor with a right border (vertical divider)
+    // and the right cell shows the dividend with a top border (the vinculum) on the same line.
     function renderLongDivisionHint(numerator, denominator) {
       return '<table class="long-division-table">' +
              '<tr>' +
-               '<td class="divisor-cell">' + denominator + '</td>' +
-               '<td class="quotient-cell">&nbsp;</td>' +
-             '</tr>' +
-             '<tr>' +
-               '<td></td>' +
-               '<td class="dividend-cell">' + numerator + '.000</td>' +
+             '<td class="divisor-cell">' + denominator + '</td>' +
+             '<td class="dividend-cell">' + numerator + '.000</td>' +
              '</tr>' +
              '</table>';
     }
@@ -171,7 +166,7 @@
       var fractionDisplay = renderFraction(numerator, denominator);
       var questionText = "Convert " + fractionDisplay + " to a decimal:";
       
-      // Calculate the correct decimal answer (always shown with three decimals)
+      // Calculate the correct decimal answer (always with three decimals)
       var correctDecimal = (numerator / denominator).toFixed(3);
       
       // Prepare the long division hint without revealing the answer

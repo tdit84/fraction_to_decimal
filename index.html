@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fraction to Decimal Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 10px;
+    }
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .choice {
+      padding: 10px 20px;
+      border: 2px solid black;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 20px;
+      background-color: #fff;
+      transition: background-color 0.3s;
+    }
+    .choice:hover {
+      background-color: #f0f0f0;
+    }
+    .correct {
+      background-color: lightgreen !important;
+    }
+    .incorrect {
+      background-color: lightcoral !important;
+    }
+    #question {
+      font-size: 24px;
+      margin: 20px;
+    }
+    .fraction {
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+    .fraction .top {
+      display: block;
+      border-bottom: 1px solid #000;
+      padding: 0 2px;
+    }
+    .fraction .bottom {
+      display: block;
+      padding: 0 2px;
+    }
+    #feedback {
+      font-size: 20px;
+      margin: 20px;
+    }
+    #starCounter {
+      display: inline-block;
+      margin-right: 20px;
+    }
+    #message {
+      display: inline-block;
+      height: 24px;
+    }
+    #hintBtn {
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #hintText {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #555;
+    }
+    /* Styling for a simple long division display */
+    .long-division {
+      display: inline-block;
+      text-align: left;
+      font-family: monospace;
+      margin-top: 10px;
+    }
+    .long-division .top-line {
+      border-bottom: 2px solid #000;
+      padding-right: 20px;
+    }
+    .flip-animation {
+      display: inline-block;
+      animation: flip 1s ease;
+    }
+    @keyframes flip {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(180deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Fraction to Decimal Converter</h1>
+  <div id="question"></div>
+  <button id="hintBtn">Show Hint</button>
+  <div id="hintText" style="display:none;"></div>
+  <div class="choices" id="choices"></div>
+  <div id="feedback">
+    <span id="starCounter">⭐ 0</span>
+    <span id="message"></span>
+  </div>
+  
+  <script>
+    var starCount = 0;
+    function updateStarCounter() {
+      document.getElementById("starCounter").innerHTML = "⭐ " + starCount;
+    }
+    
+    // Render a fraction with a numerator over a denominator (vinculum line)
+    function renderFraction(numerator, denominator) {
+      return '<span class="fraction"><span class="top">' + numerator + '</span><span class="bottom">' + denominator + '</span></span>';
+    }
+    
+    // Render a long division layout for numerator ÷ denominator with the decimal result above the vinculum line.
+    function renderLongDivision(numerator, denominator, decimalResult) {
+      return '<div class="long-division">' +
+             '<div class="top-line">' + decimalResult + '</div>' +
+             '<div><span style="border-right:2px solid #000; padding-right:5px;">' + denominator + '</span> ' + numerator + '.000</div>' +
+             '</div>';
+    }
+    
+    // Fisher-Yates shuffle to randomize answer choices
+    function shuffleArray(array) {
+      for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+    }
+    
+    // Generate a new fraction to decimal question
+    function generateQuestion() {
+      document.getElementById("message").innerHTML = "";
+      document.getElementById("hintText").style.display = "none";
+      
+      // Use denominators that yield terminating decimals
+      var denominators = [2, 4, 5, 8, 10];
+      var denominator = denominators[Math.floor(Math.random() * denominators.length)];
+      // Allow numerator between 1 and (denominator*2) for variety
+      var numerator = Math.floor(Math.random() * (denominator * 2 - 1)) + 1;
+      
+      var fractionDisplay = renderFraction(numerator, denominator);
+      var questionText = "Convert " + fractionDisplay + " to a decimal:";
+      
+      // Calculate correct decimal and remove trailing zeros if necessary
+      var correctDecimal = (numerator / denominator);
+      correctDecimal = parseFloat(correctDecimal.toFixed(3)).toString();
+      
+      // Prepare the long division hint display
+      var longDivisionDisplay = renderLongDivision(numerator, denominator, correctDecimal);
+      var hintMsg = "Hint: Divide the numerator by the denominator using long division.<br><br>" + longDivisionDisplay;
+      document.getElementById("hintText").innerHTML = hintMsg;
+      
+      // Generate answer choices (one correct and three distractors)
+      var choices = [];
+      choices.push(correctDecimal);
+      while (choices.length < 4) {
+        var offset = (Math.random() < 0.5 ? 0.1 : -0.1) * (Math.floor(Math.random() * 3) + 1);
+        var candidate = parseFloat((parseFloat(correctDecimal) + offset).toFixed(3)).toString();
+        if (choices.indexOf(candidate) === -1 && candidate !== correctDecimal) {
+          choices.push(candidate);
+        }
+      }
+      shuffleArray(choices);
+      
+      document.getElementById("question").innerHTML = questionText;
+      var choicesDiv = document.getElementById("choices");
+      choicesDiv.innerHTML = "";
+      for (var i = 0; i < choices.length; i++) {
+        var btn = document.createElement("div");
+        btn.className = "choice";
+        btn.innerHTML = choices[i];
+        btn.onclick = (function(selected, correct) {
+          return function() {
+            if (selected === correct) {
+              this.classList.add("correct");
+              document.getElementById("message").innerHTML = "Correct! 🎉";
+              starCount++;
+              updateStarCounter();
+              setTimeout(generateQuestion, 1000);
+            } else {
+              this.classList.add("incorrect");
+              document.getElementById("message").innerHTML = "Incorrect! ❌";
+              starCount--;
+              updateStarCounter();
+            }
+          };
+        })(choices[i], correctDecimal);
+        choicesDiv.appendChild(btn);
+      }
+    }
+    
+    document.getElementById("hintBtn").addEventListener("click", function() {
+      var hintDiv = document.getElementById("hintText");
+      hintDiv.style.display = (hintDiv.style.display === "none") ? "block" : "none";
+    });
+    
+    window.onload = function() {
+      updateStarCounter();
+      generateQuestion();
+    };
+  </script>
+</body>
+</html>
